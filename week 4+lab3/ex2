@@ -1,0 +1,16 @@
+drop view if exists old_rentals;
+create view old_rentals as
+SELECT rental_date 
+FROM rental 
+WHERE rental_date < '2005-05-25';
+
+drop view if exists dis_amount;
+create view dis_amount as
+SELECT DISTINCT amount FROM payment ORDER BY amount;
+
+create trigger upd_address
+before INSERT or UPDATE
+on
+address
+for each row
+last_update = GETDATE()
