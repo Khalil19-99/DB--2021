@@ -1,0 +1,67 @@
+B-Tree index:
+
+First Query:
+
+B-tree index is mainly use to improve queries to avoid large sorting operations. We can notice that in our query we are looking for payments with less amount than other payments. So the B-tree index comes very handy here if we create it on `amount` column in `payment` table.
+
+CREATE INDEX payment_btree ON payment USING btree (amount)
+Cost before creating the index: 12062691.37
+Cost  after creating the index: 11659130.21
+Improvement: ~4%
+
+Second Query:
+By the same logic we can create a b-tree index on `last_update` column in the `rental` table. Because it also requires sorted sequences.
+
+CREATE INDEX update_btree ON rental USING btree (last_update)
+Cost before creating the index: 2284549.49
+Cost  after creating the index: 1557083.92
+Improvement: ~32%
+
+Third Query:
+We can create a b-tree index on `rental_duration` column in `film` table
+CREATE INDEX rental_btree ON film USING btree (rental_duration)
+Cost before creating the index: 7747.20
+Cost  after creating the index: 5379.28
+Improvement: ~30%
+
+Hash Index:
+
+First Query:
+In the first query there are 2 filters happening, the first one on id equality and the second one is on amount comparison. Since ids are all primary keys they are indexed by default. Creating a Hash index doesn't speed up. Since payment amounts are quantitative values, hashing is highly unlikely to make any difference. I created the index and there are no benefits.
+
+CREATE INDEX payment_hash ON payment USING hash (amount)
+Cost before creating the index: 12062691.37
+Cost  after creating the index: 12062691.37
+Improvement: 0%
+
+Second Query:
+Hash index is especially useful when there are equality filters (in our case c.active = 1). The query didn't improve just because there were very few entries to discard as per the analyzer.
+
+CREATE INDEX active_hash ON customer using hash (active)
+Cost before creating the index: 2284549.49
+Cost  after creating the index: 2284549.49
+Improvement: 0%
+
+Third Query:
+Hash indexes aren't really useful in the third query, because there are no equalities. There are equalities on primary keys but again primary keys are indexed by default. I tried creating the index on release year column but the groupby operation by default sorts so it wasn't useful.
+
+CREATE INDEX release_hash ON film USING hash (release_year)
+Cost before creating the index: 7747.20
+Cost  after creating the index: 7747.20
+Improvement 0%
+
+SP_GIST Index:
+Gist indexes are useful for geometric data and search in texts, particularly for operators ( ‘>>’  ‘<<|’  ‘>>|’ ‘~=’  ‘&&’ , ‘<<’  ‘&<’  ‘&>’). Such operators/data isn't utilized in our queries, hence the index isn't useful for us.
+This applies for all queries we have in the assighment.
+
+First Query:
+Cost before creating the index: 12062691.37
+Cost  after creating the index: 12062691.37
+
+Second Query:
+Cost before creating the index: 2284549.49
+Cost  after creating the index: 2284549.49
+
+Third Query:
+Cost before creating the index: 7747.20
+Cost  after creating the index: 7747.20
