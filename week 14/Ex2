@@ -1,0 +1,18 @@
+import redis
+
+r = redis.Redis(host='redis-12395.c261.us-east-1-4.ec2.cloud.redislabs.com', port=12395, db=0, password='<password>')
+
+# Exercise
+# User skeleton
+r.hset("user", 'username', 'Mark')
+r.hset("user", 'id',        1)
+r.hset("user", 'name',      'Mike')
+r.hset("user", 'Followers', 12)
+r.hset("user", 'Following', 9)
+r.hset("user", 'Posts',     19)
+
+
+r.hset("post", 'user_id', 1 )
+r.hset("user", 'time',    "01/09/2020 20:00:12")
+r.hset("user", 'content', 'Some information about content of the post')
+

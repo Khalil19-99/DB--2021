@@ -1,0 +1,93 @@
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS ledger;
+CREATE TABLE accounts (
+	user_id serial PRIMARY KEY,
+	username VARCHAR ( 50 ) UNIQUE NOT NULL,
+	Credit INT NOT NULL
+);
+CREATE TABLE ledger (
+	user_id serial PRIMARY KEY,
+	idfrom INT NOT NULL,
+	idto INT NOT NULL,
+	fees INT NOT NULL,
+	amount INT NOT NULL,
+	TransactionDateTime Timestamp
+);
+
+
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (1, 'Ramesh', 1000 );
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (2, 'Darwish', 1000 );
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (3, 'Shbeb', 1000 );
+
+BEGIN TRANSACTION;
+SAVEPOINT my_savepointT0;
+
+UPDATE accounts SET Credit = Credit - 500
+    WHERE user_id=1;
+UPDATE accounts SET Credit = Credit + 500
+    WHERE user_id=3;
+SAVEPOINT my_savepointT1;
+
+
+
+UPDATE accounts SET Credit = Credit - 700
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 700
+    WHERE user_id=1;
+SAVEPOINT my_savepointT2;
+
+
+UPDATE accounts SET Credit = Credit - 100
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 100
+    WHERE user_id=3;
+SAVEPOINT my_savepointT3;
+
+ROLLBACK TO my_savepointT2;
+COMMIT;
+
+ALTER TABLE accounts
+ADD COLUMN BankName VARCHAR(50);
+UPDATE accounts SET BankName = 'Sperbank' WHERE username = 'Ramesh';
+UPDATE accounts SET BankName = 'Sperbank' WHERE username = 'Shbeb';
+UPDATE accounts SET BankName = 'Tinkoff' WHERE username = 'Darwish';
+
+BEGIN TRANSACTION;
+SAVEPOINT my_savepointT0;
+
+UPDATE accounts SET Credit = Credit - 500
+    WHERE user_id=1;
+UPDATE accounts SET Credit = Credit + 500
+    WHERE user_id=3;
+INSERT INTO ledger (user_id, idfrom,idto,fees,amount,TransactionDateTime)
+	values(1,1,3,0,500,current_timestamp);
+SAVEPOINT my_savepointT1;
+
+
+
+UPDATE accounts SET Credit = Credit - 730
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 700
+    WHERE user_id=1;
+INSERT INTO ledger (user_id, idfrom,idto,fees,amount,TransactionDateTime)
+	values(2,2,1,30,700,current_timestamp);
+SAVEPOINT my_savepointT1;
+SAVEPOINT my_savepointT2;
+SAVEPOINT my_savepointT3;
+
+
+UPDATE accounts SET Credit = Credit - 130
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 100
+    WHERE user_id=3;
+INSERT INTO ledger (user_id, idfrom,idto,fees,amount,TransactionDateTime)
+	values(3,2,3,30,100,current_timestamp);
+SAVEPOINT my_savepointT3;
+
+ROLLBACK TO my_savepointT3;
+COMMIT;
+SELECT * FROM ledger;
+

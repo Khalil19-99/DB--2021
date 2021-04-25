@@ -1,0 +1,73 @@
+DROP TABLE IF EXISTS accounts;
+CREATE TABLE accounts (
+	user_id serial PRIMARY KEY,
+	username VARCHAR ( 50 ) UNIQUE NOT NULL,
+	Credit INT NOT NULL
+);
+
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (1, 'Ramesh', 1000 );
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (2, 'Darwish', 1000 );
+INSERT INTO accounts (user_id,username,Credit)
+VALUES (3, 'Shbeb', 1000 );
+
+BEGIN TRANSACTION;
+SAVEPOINT my_savepointT0;
+
+UPDATE accounts SET Credit = Credit - 500
+    WHERE user_id=1;
+UPDATE accounts SET Credit = Credit + 500
+    WHERE user_id=3;
+SAVEPOINT my_savepointT1;
+
+
+
+UPDATE accounts SET Credit = Credit - 700
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 700
+    WHERE user_id=1;
+SAVEPOINT my_savepointT2;
+
+
+UPDATE accounts SET Credit = Credit - 100
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 100
+    WHERE user_id=3;
+SAVEPOINT my_savepointT3;
+
+ROLLBACK TO my_savepointT2;
+COMMIT;
+
+ALTER TABLE accounts
+ADD COLUMN BankName VARCHAR(50);
+UPDATE accounts SET BankName = 'Sperbank' WHERE username = 'Ramesh';
+UPDATE accounts SET BankName = 'Sperbank' WHERE username = 'Shbeb';
+UPDATE accounts SET BankName = 'Tinkoff' WHERE username = 'Darwish';
+
+BEGIN TRANSACTION;
+SAVEPOINT my_savepointT0;
+
+UPDATE accounts SET Credit = Credit - 500
+    WHERE user_id=1;
+UPDATE accounts SET Credit = Credit + 500
+    WHERE user_id=3;
+SAVEPOINT my_savepointT1;
+
+
+
+UPDATE accounts SET Credit = Credit - 730
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 700
+    WHERE user_id=1;
+SAVEPOINT my_savepointT2;
+
+
+UPDATE accounts SET Credit = Credit - 130
+    WHERE user_id=2;
+UPDATE accounts SET Credit = Credit + 100
+    WHERE user_id=3;
+SAVEPOINT my_savepointT3;
+
+ROLLBACK TO my_savepointT2;
+COMMIT;

@@ -1,0 +1,42 @@
+Exercise 1:
+
+Read committed:
+
+1- Both terminals show the same results because the isolation level doesn't allow dirty reads 
+
+
+2- while doing Update the balance for Alice’s account, the value increased just by 20 as there is a loss in the update.
+The isolation level doesn't protect from lost updates.
+
+Repeatable Read:
+
+1- Both terminals show the same results because the isolation level doesn't allow dirty reads 
+
+
+2- while doing Update the balance for Alice’s account, the value increased by 30 
+   because the isolation level protects from lost updates.
+   
+   
+Exercise 2:
+
+Read committed: 
+
+It seems that this isolation level doesn't protect from non-repeatable read, so in the first transaction, the read queries will get different values. 
+ That will result in updating bob's balance by +15.
+
+Repeatable Read: 
+
+It seems that this isolation level protects from non-repeatable read so in the first transaction the read queries will get the same values. 
+Only accounts with group_id = 2 before the transactions began will have an updated balance.
+
+
+
+
+Exercise 3:
+
+It seems that the  T1 doesn't get affected by moving bob to group2 even In both isolation levels.
+the reason is that both isolation levels prevent non-repeatable reads.
+
+while in the last read query in T1 we won't find bob because the update comes from the transaction T2 but in T2 we will find bob.
+
+
